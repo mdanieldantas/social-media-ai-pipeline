@@ -1,0 +1,42 @@
+# Dependências do Node.js
+node_modules/
+
+# Arquivos de ambiente
+.env
+.env.*
+!.env.example
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# Builds e artefatos de compilação
+build/
+dist/
+out/
+coverage/
+.cache/
+.next/
+.vite/
+
+# Editor / sistema operacional
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Dados e mídias geradas pelo pipeline
+resources/videos/
+resources/**/*.csv
+resources/**/*.json
+resources/**/*.txt
+
+# Arquivos temporários
+*.tmp
+tmp/
+temp/

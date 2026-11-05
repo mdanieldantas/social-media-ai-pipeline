@@ -1,7 +1,0 @@
-[mcp_servers.instagram-videos]
-command = "node"
-args = ["C:/repos/ai-driven-development/projetos/projeto-instagran/resources/mcps/instagram-videos/src/server.js"]
-cwd = "C:/repos/ai-driven-development/projetos/projeto-instagran"
-enabled = true
-startup_timeout_sec = 20
-tool_timeout_sec = 3600
