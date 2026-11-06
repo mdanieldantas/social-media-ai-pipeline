@@ -29,25 +29,25 @@ if (envPath) dotenv.config({ path: envPath });
 export const ENV_FILE_PATH = envPath;
 
 // Lança um erro com mensagem clara quando a chave não está configurada.
-export function requireOpenAIKey() {
-  const key = (process.env.OPENAI_API_KEY || "").trim();
-  if (!key) {
-    const ondeProcurou = envPath
-      ? `Foi lido o arquivo: ${envPath}, mas ele não define OPENAI_API_KEY.`
-      : `Nenhum arquivo .env foi encontrado na raiz do projeto.`;
-    throw new Error(
-      "A chave da OpenAI não está configurada. " +
-        ondeProcurou +
-        " Crie (ou edite) um arquivo .env na raiz do projeto com a linha:\n" +
-        "OPENAI_API_KEY=sk-...\n" +
-        "Depois reinicie o MCP para que a variável seja carregada."
-    );
-  }
-  return key;
+export function transcribeProvider() {
+  const provider = (process.env.TRANSCRIBE_PROVIDER ||
+    (process.env.OPENROUTER_API_KEY && !process.env.OPENAI_API_KEY ? "openrouter" : "openai")).trim().toLowerCase();
+  if (!["openai", "openrouter"].includes(provider)) throw new Error("TRANSCRIBE_PROVIDER deve ser openai ou openrouter.");
+  return provider;
 }
 
-// Modelo de transcrição configurável; padrão whisper-1 (amplamente disponível
-// e aceita resposta em texto puro).
 export function transcribeModel() {
-  return (process.env.OPENAI_TRANSCRIBE_MODEL || "whisper-1").trim();
+  return transcribeProvider() === "openrouter"
+    ? (process.env.OPENROUTER_TRANSCRIBE_MODEL || "openai/whisper-1").trim()
+    : (process.env.OPENAI_TRANSCRIBE_MODEL || "whisper-1").trim();
+}
+
+export function transcriptionConfig() {
+  const provider = transcribeProvider();
+  const variable = provider === "openrouter" ? "OPENROUTER_API_KEY" : "OPENAI_API_KEY";
+  const apiKey = (process.env[variable] || "").trim();
+  if (!apiKey) throw new Error(`Configure ${variable} no arquivo ${envPath || ".env"} e reinicie o MCP.`);
+  return { provider, apiKey, model: transcribeModel(), url: provider === "openrouter"
+    ? "https://openrouter.ai/api/v1/audio/transcriptions"
+    : "https://api.openai.com/v1/audio/transcriptions" };
 }

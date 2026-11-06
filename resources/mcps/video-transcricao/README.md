@@ -1,6 +1,6 @@
 # video-transcricao (MCP)
 
-MCP server que transcreve vídeos para texto usando a API da OpenAI.
+MCP server que transcreve vídeos para texto usando a API da OpenAI ou OpenRouter.
 
 ## O que faz
 
@@ -10,17 +10,37 @@ MCP server que transcreve vídeos para texto usando a API da OpenAI.
 - Usa um **ffmpeg/ffprobe portáveis** (binários estáticos via npm): funciona em qualquer SO sem instalar nada no sistema.
 - Respeita o **limite de 25 MB** da API: se o áudio passar do limite, ele é dividido em partes automaticamente e as transcrições são juntadas.
 
-## Configuração
+## Configuracao
 
-Crie um arquivo `.env` na **raiz do projeto** com a chave da OpenAI:
+Crie `.env` na pasta deste MCP (ao lado de `index.js`), usando `.env.example` como referencia:
 
+```dotenv
+TRANSCRIBE_PROVIDER=openrouter
+OPENROUTER_API_KEY=sua-chave-openrouter
+OPENROUTER_TRANSCRIBE_MODEL=openai/whisper-1
 ```
-OPENAI_API_KEY=sk-...
-# opcional: escolher o modelo de transcrição (padrão: whisper-1)
-# OPENAI_TRANSCRIBE_MODEL=gpt-4o-mini-transcribe
+
+O modelo precisa oferecer **speech-to-text (STT)**; modelos apenas de chat nao servem.
+Documentacao: https://openrouter.ai/docs/guides/overview/multimodal/stt
+O audio e enviado ao OpenRouter e ao provedor do modelo escolhido. O uso depende de saldo e acesso nesse servico.
+
+Para continuar usando OpenAI:
+
+```dotenv
+TRANSCRIBE_PROVIDER=openai
+OPENAI_API_KEY=sua-chave-openai
+OPENAI_TRANSCRIBE_MODEL=whisper-1
 ```
 
-Se a chave não estiver configurada, o MCP devolve uma mensagem clara explicando como corrigir.
+Sem `TRANSCRIBE_PROVIDER`, usa OpenAI por compatibilidade; se apenas a chave
+OpenRouter estiver definida, usa OpenRouter. Com ambas as chaves, selecione
+explicitamente `openrouter` para usa-lo. Nao existe fallback automatico entre provedores.
+Reinicie o MCP depois de alterar o `.env`. A busca pelo arquivo comeca na pasta
+do MCP e sobe pelos diretorios pais; usa o diretorio atual como alternativa.
+
+As respostas JSON das APIs sao convertidas para texto simples no `.txt`.
+Erros HTTP mostram o provedor e o status, sem expor a chave. Falhas de rede e
+saldo insuficiente sao informadas separadamente.
 
 ## Tools
 
